@@ -1,7 +1,9 @@
 import random
 import numpy as np
+import scipy as sp
 import pandas as pd
 import networkx as nx
+from scipy import sparse
 from scipy.linalg import sqrtm
 from sklearn.model_selection import train_test_split
 
@@ -43,7 +45,7 @@ def get_adj_matrix(data, formatizer = {'user':0, 'movie':1, 'rating':2}):
         data: a pandas DataFrame of the data
 
     Returns:
-        X: a pandas dataframe of the adjacency matrix
+        X: a numpy array of the adjacency matrix
         users_index:
         movies_index:
     """
@@ -96,19 +98,10 @@ def svd(adj_matrix, k):
 
     """
     adj_matrix = mask_nan_entries_with_avg(adj_matrix)
-    U, s, V = np.linalg.svd(adj_matrix, full_matrices=False)
+    adj_matrix = sparse.coo_matrix(adj_matrix)
+    U, s, V = sparse.linalg.svds(adj_matrix, k=k)
     s = np.diag(s)
-
-    s = s[:k, :k]
-    U = U[:, :k]
-    V = V[:k, :]
-    
-    s_root = sqrtm(s)
-    Usk = np.dot(U, s_root)
-    skV = np.dot(s_root, V)
-    UsV = np.dot(Usk, skV)
-
-    UsV = UsV
+    UsV = (U.dot(s)).dot(V)
     return UsV
 
 def calculate_derivative_network(adj_matrix, k):
@@ -124,8 +117,7 @@ def calculate_derivative_network(adj_matrix, k):
     adj_matrix = mask_nan_entries_with_avg(adj_matrix)
     U, s, Vh = np.linalg.svd(adj_matrix, full_matrices=False)
     s = np.diag(s)
-
-    derivative_network = 2 * U[:, k:] @ s[k:, k:] @ Vh[k:, :]
+    derivative_network = 2 * U[:, k+1:] @ s[k+1:, k+1:] @ Vh[k+1:, :]
     return derivative_network
 
 def predict_ratings():
@@ -177,16 +169,15 @@ def find_max_edge(derivative_network):
     """
     max_ind = (-1, -1)
     max_val = float('-inf')
-    num_rows, num_cols = derivative_network.shape[0], derivative_network.shape[1]
-    for i in range(num_rows):
-        for j in range(num_cols):
-            if derivative_network[i][j] > max_val:
-                max_ind = (i, j)
-                max_val = derivative_network[i][j]
+    derivative_network = sparse.coo_matrix(derivative_network)
+    for i, j, derivative in zip(derivative_network.row, derivative_network.col, derivative_network.data):
+        if derivative > max_val:
+            max_ind = (i, j)
+            max_val = derivative
     return max_ind
 
 def main():
-    k = 12
+    k = 8
     seed = random.randint(0, 50)
     ratings_data, users, movies = load_data("ml-latest-small/ratings.csv")
     # train_ratings_data, test_ratings_data = split_dataset(ratings_data, seed)
