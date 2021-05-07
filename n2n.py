@@ -92,10 +92,15 @@ def main(argv):
         print("Please mention a dataset (movielens or jester)")
         return
 
-    k = 8
+    k = 12
+    num_perturbs = 20
     dataset_name = argv[0]
+    if dataset_name == "lastfm":
+        num_perturbs = 10
+        k = 50
+    
     adj_matrix = load_data(dataset_name)
-    perturbed_matrix = perturb_matrix(adj_matrix, 20, k)
+    perturbed_matrix = perturb_matrix(adj_matrix, num_perturbs, k)
 
     omega_c = np.count_nonzero(np.isnan(adj_matrix))
     orig_svd = svd(adj_matrix, k)
