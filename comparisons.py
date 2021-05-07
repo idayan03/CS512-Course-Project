@@ -2,7 +2,7 @@ import numpy as np
 import networkx as nx
 from copy import deepcopy
 
-from n2n import svd, evaluate_error
+from n2n import svd, evaluate_error, perturb_matrix
 from load_data import load_data, get_adj_matrix
 from aurora_v2.utils import power_method_left, power_method_right, power_method_right_with_scaling
 
@@ -156,7 +156,7 @@ def aurora(adj_matrix, k):
                 e_max = e
                 max_grad = gradient
         B.remove_edge(e_max[0], e_max[1])
-        S.append((e_max[0],e_max[1]))
+        S.append((e_max[1],e_max[0]))
     return S
 def get_Ahat(adj_matrix,S):
     '''
@@ -173,13 +173,16 @@ def get_Ahat(adj_matrix,S):
 
 def main():
     baseline_errors = {}
-    k = 12
+    k = 8
     budget = 4
-    adj_matrix = load_data("movielens")
+
+    # adj_matrix = load_data("movielens")
+    adj_matrix = load_data("jester")
+    perturbed_matrix = perturb_matrix(adj_matrix, budget, k)
+    error = comparison_error(adj_matrix,perturbed_matrix,k)
+    baseline_errors['ours'] = error
+    print('ours',error)
     # train_ratings_data, test_ratings_data = split_dataset(ratings_data, seed)
-
-
-    graph = get_graph(adj_matrix)
 
     # degree centrality
     S = deg_centrailty_influence(adj_matrix, budget)
