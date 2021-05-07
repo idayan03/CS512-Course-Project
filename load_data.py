@@ -1,7 +1,13 @@
 import numpy as np
 import pandas as pd
 
-def load_data(path):
+def load_data(dataset_name):
+    if dataset_name == "jester":
+        return load_jester("datasets/jester.xlsx")
+    elif dataset_name == "movielens":
+        return load_movielens("datasets/ml-latest-small/ratings.csv")
+
+def load_movielens(path):
     """Loads the MovieLens data from path
 
     Args:
@@ -14,9 +20,22 @@ def load_data(path):
     """
     data = pd.read_csv(path)
     data.drop(columns=['timestamp'], inplace=True)  # Timestamp not needed
-    users = data["userId"].unique()
-    movies = data["movieId"].unique()
-    return data, users, movies
+    return get_adj_matrix(data)
+
+def load_jester(path):
+    """Loads the Jester dataset from path
+
+    Args:
+        path: the path of the jester dataset
+    
+    Returns:
+        adj_matrix: the adjacency matrix of the jester ratings
+    """
+    data = pd.read_excel(path, header=None)
+    data.drop(data.columns[0], axis=1, inplace=True)    # Drop 1st column
+    data.replace(to_replace=99, value=np.nan, inplace=True)    # 99 corresponds to no rating
+    adj_matrix = np.array(data)
+    return adj_matrix
 
 def split_dataset(data, seed, test_ratio=0.2):
     """Splits the dataset into train and test datasets
@@ -71,4 +90,4 @@ def get_adj_matrix(data, formatizer = {'user':0, 'movie':1, 'rating':2}):
     moviecols = list(X.columns)
     movies_index = {moviecols[i]:i for i in range(len(moviecols))}
 
-    return np.array(X), users_index, movies_index
+    return np.array(X)

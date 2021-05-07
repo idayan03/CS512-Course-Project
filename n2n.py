@@ -1,3 +1,4 @@
+import sys
 import random
 import numpy as np
 import scipy as sp
@@ -7,6 +8,8 @@ from sklearn.model_selection import train_test_split
 
 from utils import *
 from load_data import *
+
+""" Example Run : python(3) n2n.py {jester, movielens} """
 
 def svd(adj_matrix, k):
     """Computes the svd of adj_matrix
@@ -84,11 +87,14 @@ def evaluate_error(orig_svd, perturbed_svd, orig_adj_matrix, omega_c):
     error = np.sqrt(error)
     return error
 
-def main():
+def main(argv):
+    if len(argv) < 1:
+        print("Please mention a dataset (movielens or jester)")
+        return
+
     k = 8
-    seed = random.randint(0, 50)
-    ratings_data, users, movies = load_data("ml-latest-small/ratings.csv")
-    adj_matrix, users_index, movies_index = get_adj_matrix(ratings_data)
+    dataset_name = argv[0]
+    adj_matrix = load_data(dataset_name)
     perturbed_matrix = perturb_matrix(adj_matrix, 20, k)
 
     omega_c = np.count_nonzero(np.isnan(adj_matrix))
@@ -98,4 +104,4 @@ def main():
     print(error)
     
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
