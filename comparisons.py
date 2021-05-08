@@ -168,7 +168,14 @@ def get_Ahat(adj_matrix,S):
     '''
     Ahat = adj_matrix.copy()
     for e in S:
-        Ahat[e[0]][e[1]] = np.nan
+        try:
+            b = Ahat[e[0]]
+            e1 = e[0]
+            e2 = e[1]
+        except IndexError:
+            e1 = e[1]
+            e2 = e[0]
+        Ahat[e1][e2] = np.nan
     return Ahat
 
 def main():
