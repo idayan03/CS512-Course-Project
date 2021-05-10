@@ -60,6 +60,7 @@ def perturb_matrix(adj_matrix, num_perturbs, k):
     """
     perturbed_adj_matrix = np.copy(adj_matrix)
     for i in range(num_perturbs):
+        print(i)
         derivative_network = calculate_derivative_network(perturbed_adj_matrix, k)
         max_edge = find_max_edge(derivative_network)
         perturbed_adj_matrix[max_edge[0]][max_edge[1]] = np.nan
@@ -93,11 +94,8 @@ def main(argv):
         return
 
     k = 12
-    num_perturbs = 20
+    num_perturbs = 10
     dataset_name = argv[0]
-    if dataset_name == "lastfm":
-        num_perturbs = 10
-        k = 50
     
     adj_matrix = load_data(dataset_name)
     perturbed_matrix = perturb_matrix(adj_matrix, num_perturbs, k)

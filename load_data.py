@@ -8,9 +8,9 @@ def load_data(dataset_name):
         return load_jester("datasets/jester.xlsx")
     elif dataset_name == "movielens":
         return load_movielens("datasets/ml-latest-small/ratings.csv")
-    elif dataset_name == "lastfm":
-        path = os.path.join("datasets", "lastfm.dat")
-        return load_lastfm(path)
+    elif dataset_name == "modcloth":
+        path = os.path.join("datasets", "modcloth.csv")
+        return load_modcloth(path)
 
 def load_movielens(path):
     """Loads the MovieLens data from path
@@ -40,24 +40,25 @@ def load_jester(path):
     adj_matrix = np.array(data)
     return adj_matrix
 
-def load_lastfm(path):
-    data = pd.read_csv(path, names=['user', 'artist', 'feedback'], sep='\t')
+def load_modcloth(path):
+    data = pd.read_csv(path, sep=',')
+    data.drop(columns=['timestamp','size','fit','user_attr','model_attr','category','brand','year','split'], inplace=True)
     
-    userList = data.iloc[:, 0].tolist()
-    artistList = data.iloc[:, 1].tolist()
-    feedbackList = data.iloc[:, 2].tolist()
+    userList = data.iloc[:, 1].tolist()
+    itemList = data.iloc[:, 0].tolist()
+    ratingList = data.iloc[:, 2].tolist()
 
     users = list(set(userList))
-    artists = list(set(artistList))
+    items = list(set(itemList))
 
     users_index = {users[i] : i for i in range(len(users))}
-    pd_dict = {artist : [np.nan for i in range(len(users))] for artist in artists}
+    pd_dict = {item : [np.nan for i in range(len(users))] for item in items}
 
     for i in range(len(data)):
         user = userList[i]
-        artist = artistList[i]
-        feedback = feedbackList[i]
-        pd_dict[artist][users_index[user]] = feedback
+        item = itemList[i]
+        rating = ratingList[i]
+        pd_dict[item][users_index[user]] = rating
 
     X = pd.DataFrame(pd_dict)
     X.index = users
