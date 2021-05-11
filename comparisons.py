@@ -170,6 +170,12 @@ def get_Ahat(adj_matrix,S):
     for e in S:
         try:
             b = Ahat[e[0]]
+            try: 
+                c = Ahat[e[0]][e[1]]
+            except IndexError:
+                e1 = e[1]
+                e2 = e[0]
+                break
             e1 = e[0]
             e2 = e[1]
         except IndexError:
