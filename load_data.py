@@ -11,6 +11,12 @@ def load_data(dataset_name):
     elif dataset_name == "modcloth":
         path = os.path.join("datasets", "modcloth.csv")
         return load_modcloth(path)
+    elif dataset_name == "karate":
+        return load_karate()
+    elif dataset_name == "dolphins":
+        return load_dolphins("datasets/dolphins/dolphins.gml")
+    elif dataset_name == "football":
+        return load_football("datasets/football/football.gml")
 
 def load_movielens(path):
     """Loads the MovieLens data from path
@@ -63,6 +69,23 @@ def load_modcloth(path):
     X = pd.DataFrame(pd_dict)
     X.index = users
     return np.array(X)
+
+def load_karate():
+    """Loads the Zachary Karate Club dataset for clustering/community detection
+    """
+    zkc_graph = nx.karate_club_graph()
+    data = nx.convert_matrix.to_numpy_matrix(zkc_graph)
+    return data
+
+def load_dolphins(path):
+    G = nx.read_gml(path)
+    data = nx.to_numpy_array(G)
+    return data
+
+def load_football(path):
+    G = nx.read_gml(path)
+    data = nx.to_numpy_array(G)
+    return data
 
 def split_dataset(data, seed, test_ratio=0.2):
     """Splits the dataset into train and test datasets

@@ -100,8 +100,6 @@ def hits_influence(adj_matrix, k):
         S.append(max_e)
     return S
 
-
-
 def get_r(graph, start_vector, max_iter, alpha, tol):
     r = deepcopy(start_vector)
     for num_iter in range(max_iter):
@@ -158,6 +156,7 @@ def aurora(adj_matrix, k):
         B.remove_edge(e_max[0], e_max[1])
         S.append((e_max[1],e_max[0]))
     return S
+
 def get_Ahat(adj_matrix,S):
     '''
     Args:
@@ -224,5 +223,6 @@ def main():
     error = comparison_error(adj_matrix,Ahat,k)
     baseline_errors['aurora'] = error
     print('aurora: ', error)
+
 if __name__ == "__main__":
     main()

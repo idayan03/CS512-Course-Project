@@ -12,7 +12,7 @@ def mask_nan_entries_with_avg(adj_matrix):
     return adj_matrix
 
 def find_max_edge(derivative_network):
-    """Finds the maximumum user-movie relationship (rating) of the derivative network
+    """Finds the maximumum user-item relationship (rating) of the derivative network
     (A bit slow might need modifications)
     """
     max_ind = (-1, -1)
